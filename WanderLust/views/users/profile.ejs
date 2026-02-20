@@ -1,0 +1,45 @@
+<% layout("/layouts/boilerplate") -%>
+
+<div class="profile-card">
+     <div class="profile-avatar">
+          <%= user.username ? user.username.charAt(0).toUpperCase() : "U" %>
+     </div>
+     <div class="profile-details">
+          <h3><%= user.username || "User" %></h3>
+          <p><%= user.email %></p>
+          <div class="profile-stats">
+               <span><%= user.favorites ? user.favorites.length : 0 %> favorites</span>
+          </div>
+     </div>
+     <div class="profile-actions">
+          <a href="/listings/favorites" class="btn btn-sm btn-outline-dark">Favorites</a>
+          <a href="/logout" class="btn btn-sm btn-dark">Logout</a>
+     </div>
+</div>
+
+<% if (user.favorites && user.favorites.length > 0) { %>
+     <div class="profile-section">
+          <h5>Recently Saved</h5>
+          <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
+               <% for (let listing of user.favorites.slice(0, 3)) { %>
+                    <div class="col">
+                         <a href="/listings/<%= listing._id %>" class="listing-link">
+                              <div class="card listing-card">
+                                   <% const imageUrl = listing.image && listing.image.url ? listing.image.url : "/images/placeholder.svg"; %>
+                                   <img src="<%= imageUrl %>" class="card-img-top" alt="listing_image"
+                                        style="height: 20rem" />
+                                   <div class="card-img-overlay"></div>
+                                   <div class="card-body">
+                                        <p class="card-text">
+                                             <b><%= listing.title %></b><br />
+                                             &#8377; <%= listing.price.toLocaleString("en-IN") %>/night
+                                        </p>
+                                   </div>
+                              </div>
+                         </a>
+                    </div>
+               <% } %>
+          </div>
+          <a class="btn btn-sm btn-outline-secondary" href="/listings/favorites">View all favorites</a>
+     </div>
+<% } %>

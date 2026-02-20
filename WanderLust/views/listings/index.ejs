@@ -1,0 +1,290 @@
+﻿<% layout("/layouts/boilerplate") -%>
+     <!-- <h1>Jai Bajrang Bali...</h1> -->
+
+     <style>
+          #filters {
+               display: flex;
+               flex-wrap: wrap;
+               align-items: center;
+          }
+
+          .filter-category {
+               background-color: rgba(169, 169, 169, 0.377);
+               display: flex;
+               align-items: center;
+               width: 75%;
+               height: 5rem;
+               scroll-behavior: smooth;
+               overflow: hidden;
+               overflow-x: scroll;
+               white-space: nowrap;
+               scrollbar-width: none;
+               padding: 0.25rem  2rem 0rem 2rem;
+               border-radius: 10rem;
+               margin-top: 1rem;
+          }
+
+
+          .filter {
+               text-align: center;
+               margin-right: 2rem;
+               margin-top: 1.5rem;
+               opacity: 0.7;
+               padding: 0;
+          }
+
+          .filter:hover {
+               opacity: 1;
+               cursor: pointer;
+          }
+
+          .filter p {
+               font-size: 0.8rem;
+          }
+
+          .filter:hover {
+               font-size: 0.85rem;
+               border-bottom: 8px solid black;               
+          }
+
+
+          .filter-link {
+               text-decoration: none;
+               color: inherit;
+          }
+
+          .filter.active {
+               opacity: 1;
+               border-bottom: 2px solid black;
+          }
+
+          .tax-info {
+               display: none;
+               font-size: 0.85rem;
+               color: red;
+          }
+
+          .tax-toggle {
+               border: 1px solid black;
+               border-radius: 1rem;
+               height: 3.25rem;
+               padding: 1rem;
+               margin-left: 2rem;
+               display: flex;
+               align-items: center;
+          }
+     </style>
+     <%
+          const iconMap = {
+               "Trending": "fa-fire",
+               "Rooms": "fa-bed",
+               "Iconic Cities": "fa-mountain-city",
+               "Mountains": "fa-mountain",
+               "Castles": "fa-fort-awesome",
+               "Amazing Pool": "fa-person-swimming",
+               "Camping": "fa-campground",
+               "Farms": "fa-cow",
+               "Arctic": "fa-snowman",
+               "Beach": "fa-umbrella-beach",
+               "Domes": "fa-igloo",
+               "HouseBoat": "fa-ship",
+               "A-frames": "fa-mountain",
+               "Amazing views": "fa-binoculars",
+               "Barns": "fa-warehouse",
+               "Beachfront": "fa-water",
+               "Bed & breakfasts": "fa-mug-saucer",
+               "Boats": "fa-ship",
+               "Cabins": "fa-house",
+               "Campers": "fa-campground",
+               "Casas particulers": "fa-house-chimney",
+               "Caves": "fa-mountain",
+               "Chief's kitchen": "fa-utensils",
+               "Containers": "fa-box",
+               "Countryside": "fa-tree",
+               "Cretive spaces": "fa-palette",
+               "Cycladic home": "fa-house",
+               "Dammusos": "fa-landmark",
+               "Desert": "fa-sun",
+               "Design": "fa-pen-nib",
+               "Earth homes": "fa-seedling",
+               "Golfing": "fa-golf-ball-tee",
+               "Grand pianos": "fa-music",
+               "Historicals homes": "fa-landmark",
+               "HouseBoats": "fa-ship",
+               "islands": "fa-umbrella-beach",
+               "Kezhans": "fa-hotel",
+               "Lake": "fa-water",
+               "Lakefront": "fa-water",
+               "Luxe": "fa-gem",
+               "Mansions": "fa-house-chimney-window",
+               "Minsus": "fa-house",
+               "National Parks": "fa-tree",
+               "Off-the-grid": "fa-bolt",
+               "OMG!": "fa-face-surprise",
+               "Riads": "fa-mosque",
+               "Ryokans": "fa-spa",
+               "Shared homes": "fa-people-group",
+               "shepherd's huts": "fa-person-hiking",
+               "Sky-in/out": "fa-cloud-sun",
+               "Skiing": "fa-person-skiing",
+               "Surfing": "fa-water",
+               "Tiny homes": "fa-house-chimney",
+               "Towers": "fa-chess-rook",
+               "Treehouses": "fa-tree",
+               "Tropical": "fa-umbrella-beach",
+               "Trulli": "fa-igloo",
+               "Vineyards": "fa-wine-glass",
+               "Windmills": "fa-wind",
+               "Yurts": "fa-tent"
+          };
+          const iconFor = (cat) => iconMap[cat] || "fa-tag";
+          const qp = (overrides = {}) => {
+               const base = {
+                    category: activeCategory || "",
+                    q: search || "",
+                    sort: sort || "",
+                    minPrice: minPrice ?? "",
+                    maxPrice: maxPrice ?? "",
+                    page: page ?? "",
+               };
+               const merged = { ...base, ...overrides };
+               const parts = [];
+               for (const [k, v] of Object.entries(merged)) {
+                    if (v !== null && v !== undefined && v !== "") {
+                         parts.push(`${encodeURIComponent(k)}=${encodeURIComponent(v)}`);
+                    }
+               }
+               return parts.length ? `?${parts.join("&")}` : "";
+          };
+          const startIndex = totalCount === 0 ? 0 : (page - 1) * limit + 1;
+          const endIndex = Math.min(page * limit, totalCount);
+          const startPage = Math.max(1, page - 2);
+          const endPage = Math.min(totalPages, page + 2);
+     %>
+     <div id="filters">
+          <div class="filter-category">
+               <a href="/listings<%= qp({ category: '', page: 1 }) %>" class="filter-link">
+                    <div class="filter <%= !activeCategory ? 'active' : '' %>">
+                         <div><i class="fa-solid fa-border-all"></i></div>
+                         <p>All</p>
+                    </div>
+               </a>
+
+               <% for (let cat of categories) { %>
+                    <a href="/listings<%= qp({ category: cat, page: 1 }) %>" class="filter-link">
+                         <div class="filter <%= activeCategory === cat ? 'active' : '' %>">
+                              <div><i class="fa-solid <%= iconFor(cat) %>"></i></div>
+                              <p>
+                                   <%= cat %>
+                              </p>
+                         </div>
+                    </a>
+               <% } %>
+          </div>
+
+               <div class="tax-toggle">
+                    <div class="form-check-reverse form-switch">
+                         <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
+                         <label class="form-check-label" for="switchCheckDefault">Display total after taxes</label>
+                    </div>
+               </div>
+     </div>
+
+     <div class="results-controls">
+          <div class="results-count">
+               Showing <%= startIndex %>-<%= endIndex %> of <%= totalCount %> listings
+          </div>
+          <form class="filters-form" action="/listings" method="GET">
+               <input type="hidden" name="category" value="<%= activeCategory || '' %>">
+               <input type="hidden" name="q" value="<%= search || '' %>">
+               <div class=" row filters-row">
+                    <div class="col col-md-12">
+                    <select name="sort" class="form-select form-select-sm">
+                         <option value="" <%= !sort ? 'selected' : '' %>>Sort</option>
+                         <option value="newest" <%= sort === 'newest' ? 'selected' : '' %>>Newest</option>
+                         <option value="price_asc" <%= sort === 'price_asc' ? 'selected' : '' %>>Price: Low to High</option>
+                         <option value="price_desc" <%= sort === 'price_desc' ? 'selected' : '' %>>Price: High to Low</option>
+                    </select>
+                    <input type="number" name="minPrice" min="0" step="1" class="form-control form-control-sm" placeholder="Min Rs" value="<%= minPrice %>">
+                    <input type="number" name="maxPrice" min="0" step="1" class="form-control form-control-sm" placeholder="Max Rs" value="<%= maxPrice %>">
+                    <button class="btn btn-sm btn-dark" type="submit">Apply</button>
+                    <a class="btn btn-sm btn-outline-secondary" href="/listings<%= qp({ category: activeCategory || '', q: search || '', sort: '', minPrice: '', maxPrice: '', page: 1 }) %>">Clear Filters</a>
+               </div>
+               </div>
+          </form>
+     </div>
+
+     <% if (allListings.length === 0) { %>
+          <div class="no-results">
+               <h4>No listings found</h4>
+               <p>Try a different search or clear your filters.</p>
+               <a class="btn btn-sm btn-outline-dark" href="/listings">Reset All</a>
+          </div>
+     <% } %>
+
+
+     <!-- Card -->
+     <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
+         <% for (let listing of allListings) { %>
+               <% const isFav = favoriteIds && favoriteIds.includes(listing._id.toString()); %>
+               <div class="col cols-lg-3 cols-md-2 cols-sm-1">
+                    <div class="listing-item">
+                         <% if (currUser) { %>
+                              <form class="favorite-form" action="/listings/<%= listing._id %>/favorite" method="POST">
+                                   <button class="favorite-btn <%= isFav ? 'active' : '' %>" type="submit" title="Save">
+                                        <i class="fa-solid fa-heart"></i>
+                                   </button>
+                              </form>
+                         <% } else { %>
+                              <div class="favorite-form">
+                                   <a class="favorite-btn" href="/login" title="Login to save">
+                                        <i class="fa-regular fa-heart"></i>
+                                   </a>
+                              </div>
+                         <% } %>
+                         <a href="/listings/<%= listing._id %>" class="listing-link">
+                              <div class="card listing-card">
+                                   <% const imageUrl = listing.image && listing.image.url ? listing.image.url : "/images/placeholder.svg"; %>
+                                   <img src="<%= imageUrl %>" class="card-img-top" alt="listing_image"
+                                        style="height: 20rem" />
+                                   <div class="card-img-overlay"></div>
+                                   <div class="card-body">
+                                        <p class="card-text">
+                                             <b>
+                                                  <%= listing.title %>
+                                             </b><br />
+                                             &#8377; <%= listing.price.toLocaleString("en-IN") %>/night
+
+                                             <i class="tax-info">&nbsp;&nbsp; +18% GST</i>
+                                        </p>
+                                   </div>
+                              </div>
+                         </a>
+                    </div>
+               </div>
+          <% } %>
+     </div>
+
+     <% if (totalPages > 1) { %>
+          <nav class="listing-pagination">
+               <a class="page-link <%= page <= 1 ? 'disabled' : '' %>" href="/listings<%= qp({ page: Math.max(page - 1, 1) }) %>">Prev</a>
+               <% for (let p = startPage; p <= endPage; p++) { %>
+                    <a class="page-link <%= p === page ? 'active' : '' %>" href="/listings<%= qp({ page: p }) %>"><%= p %></a>
+               <% } %>
+               <a class="page-link <%= page >= totalPages ? 'disabled' : '' %>" href="/listings<%= qp({ page: Math.min(page + 1, totalPages) }) %>">Next</a>
+          </nav>
+     <% } %>
+
+     <script>
+          let taxSwitch = document.getElementById("switchCheckDefault");
+          taxSwitch.addEventListener("click", () => {
+               let taxInfo = document.getElementsByClassName("tax-info")
+               for (info of taxInfo) {
+                    if (info.style.display != "inline") {
+                         info.style.display = "inline";
+                    } else {
+                         info.style.display = "none";
+                    }
+               }
+          })
+     </script>
